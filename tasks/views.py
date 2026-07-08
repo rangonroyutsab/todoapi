@@ -1,12 +1,18 @@
 from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
+
 from django.http import Http404
+
+from todoapi.utils import format_success_response
+
 from .serializers import TaskSerializer
 from .models import Task
-from todoapi.utils import format_success_response
 
 
 class TaskViewSet(viewsets.ViewSet):
     """API endpoints for managing To-Do tasks."""
+
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         """Retrieves a paginated, sorted, and optionally filtered list of tasks."""
@@ -39,7 +45,7 @@ class TaskViewSet(viewsets.ViewSet):
 
         order_prefix = "-" if order == "desc" else ""
 
-        queryset = Task.objects.all()
+        queryset = Task.objects.all().filter(owner=request.user)
         if status_filter:
             queryset = queryset.filter(status=status_filter)
 
@@ -63,7 +69,9 @@ class TaskViewSet(viewsets.ViewSet):
         """Creates a new task."""
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(
+            owner=request.user
+        )  # Associate the task with the authenticated user
 
         return format_success_response(
             data=serializer.data,
@@ -74,7 +82,7 @@ class TaskViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         """Retrieves a single task by its ID."""
         try:
-            task = Task.objects.get(pk=pk)
+            task = Task.objects.get(pk=pk, owner=request.user)
         except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
@@ -86,7 +94,7 @@ class TaskViewSet(viewsets.ViewSet):
     def update(self, request, pk=None):
         """Updates a specific task by its ID."""
         try:
-            task = Task.objects.get(pk=pk)
+            task = Task.objects.get(pk=pk, owner=request.user)
         except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
@@ -101,7 +109,7 @@ class TaskViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         """Deletes a task by its ID."""
         try:
-            task = Task.objects.get(pk=pk)
+            task = Task.objects.get(pk=pk, owner=request.user)
         except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
