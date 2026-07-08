@@ -1,26 +1,15 @@
 from rest_framework import viewsets, status
 from django.http import Http404
-from .store import store
-from .serializers import TaskSerializer, TaskUpdateSerializer
+from .serializers import TaskSerializer
+from .models import Task
 from todoapi.utils import format_success_response
 
 
 class TaskViewSet(viewsets.ViewSet):
-    """API endpoints for managing To-Do tasks without a database backend.
-
-    Implements custom handlers for listing, creating, retrieving,
-    updating, and deleting tasks utilizing the InMemoryTaskStore.
-    """
+    """API endpoints for managing To-Do tasks."""
 
     def list(self, request):
-        """Retrieves a paginated, sorted, and optionally filtered list of tasks.
-
-        Args:
-            request: The incoming HTTP GET request containing query parameters.
-
-        Returns:
-            A formatted JSON response containing the list of tasks and pagination metadata.
-        """
+        """Retrieves a paginated, sorted, and optionally filtered list of tasks."""
         status_filter = request.query_params.get("status")
         try:
             page = int(request.query_params.get("page", 1))
@@ -38,17 +27,28 @@ class TaskViewSet(viewsets.ViewSet):
         except ValueError:
             limit = 10
 
-        sort_by = request.query_params.get("sort_by", "createdAt")
-        if sort_by not in ("createdAt", "updatedAt"):
-            sort_by = "createdAt"
+        sort_by = request.query_params.get("sort_by", "created_at")
+        if sort_by not in ("created_at", "updated_at"):
+            sort_by = "created_at"
+
+        db_sort_by = sort_by
 
         order = request.query_params.get("order", "desc")
         if order not in ("asc", "desc"):
             order = "desc"
 
-        tasks, total = store.get_all(
-            status=status_filter, sort_by=sort_by, order=order, page=page, limit=limit
-        )
+        order_prefix = "-" if order == "desc" else ""
+
+        queryset = Task.objects.all()
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        queryset = queryset.order_by(f"{order_prefix}{db_sort_by}")
+
+        total = queryset.count()
+        start = (page - 1) * limit
+        end = start + limit
+        tasks = queryset[start:end]
 
         serializer = TaskSerializer(tasks, many=True)
 
@@ -60,53 +60,22 @@ class TaskViewSet(viewsets.ViewSet):
         )
 
     def create(self, request):
-        """Creates a new task.
-
-        Args:
-            request: The incoming HTTP POST request containing task data.
-
-        Returns:
-            A formatted JSON response containing the created task data.
-        """
+        """Creates a new task."""
         serializer = TaskSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        description = serializer.validated_data.get("description")
-        if description is None:
-            description = ""
-
-        task = store.create(
-            title=serializer.validated_data["title"],
-            description=description,
-        )
-
-        response_serializer = TaskSerializer(task)
         return format_success_response(
-            data=response_serializer.data,
+            data=serializer.data,
             message="Task created successfully",
             status_code=status.HTTP_201_CREATED,
         )
 
     def retrieve(self, request, pk=None):
-        """Retrieves a single task by its ID.
-
-        Args:
-            request: The incoming HTTP GET request.
-            pk: The primary key (ID) of the task to retrieve.
-
-        Returns:
-            A formatted JSON response containing the task data.
-
-        Raises:
-            Http404: If the task ID is invalid or not found.
-        """
+        """Retrieves a single task by its ID."""
         try:
-            task_id = int(pk)
-        except ValueError:
-            raise Http404("Task not found")
-
-        task = store.get_by_id(task_id)
-        if not task:
+            task = Task.objects.get(pk=pk)
+        except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
         serializer = TaskSerializer(task)
@@ -115,57 +84,28 @@ class TaskViewSet(viewsets.ViewSet):
         )
 
     def update(self, request, pk=None):
-        """Partially updates a specific task by its ID.
-
-        Args:
-            request: The incoming HTTP PUT request containing fields to update.
-            pk: The primary key (ID) of the task to update.
-
-        Returns:
-            A formatted JSON response containing the updated task data.
-
-        Raises:
-            Http404: If the task ID is invalid or not found.
-        """
+        """Updates a specific task by its ID."""
         try:
-            task_id = int(pk)
-        except ValueError:
+            task = Task.objects.get(pk=pk)
+        except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
-        task = store.get_by_id(task_id)
-        if not task:
-            raise Http404("Task not found")
-
-        serializer = TaskUpdateSerializer(data=request.data)
+        serializer = TaskSerializer(task, data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        updated_task = store.update(task_id, serializer.validated_data)
-
-        response_serializer = TaskSerializer(updated_task)
         return format_success_response(
-            data=response_serializer.data, message="Task updated successfully"
+            data=serializer.data, message="Task updated successfully"
         )
 
     def destroy(self, request, pk=None):
-        """Deletes a task by its ID.
-
-        Args:
-            request: The incoming HTTP DELETE request.
-            pk: The primary key (ID) of the task to delete.
-
-        Returns:
-            A formatted JSON response confirming the deletion without a data body.
-
-        Raises:
-            Http404: If the task ID is invalid or not found.
-        """
+        """Deletes a task by its ID."""
         try:
-            task_id = int(pk)
-        except ValueError:
+            task = Task.objects.get(pk=pk)
+        except (Task.DoesNotExist, ValueError):
             raise Http404("Task not found")
 
-        if not store.delete(task_id):
-            raise Http404("Task not found")
+        task.delete()
 
         return format_success_response(
             data=None,
