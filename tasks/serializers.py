@@ -14,6 +14,5 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "updated_at",
-            "owner",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "owner"]
+        read_only_fields = ["id", "created_at", "updated_at"]
