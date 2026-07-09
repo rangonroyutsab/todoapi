@@ -1,122 +1,90 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
-
-from django.http import Http404
+from rest_framework.filters import OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from todoapi.utils import format_success_response
-
 from .serializers import TaskSerializer
 from .models import Task
 
 
-class TaskViewSet(viewsets.ViewSet):
+class TaskPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "limit"
+    max_page_size = 100
+
+
+class TaskViewSet(viewsets.ModelViewSet):
     """API endpoints for managing To-Do tasks."""
 
+    serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = TaskPagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["status"]
+    ordering_fields = ["created_at", "updated_at"]
+    ordering = ["-created_at"]
 
-    def list(self, request):
-        """Retrieves a paginated, sorted, and optionally filtered list of tasks."""
-        status_filter = request.query_params.get("status")
-        try:
-            page = int(request.query_params.get("page", 1))
-            if page < 1:
-                page = 1
-        except ValueError:
-            page = 1
+    def get_queryset(self):
+        """Restrict tasks to only those owned by the authenticated user."""
+        return Task.objects.filter(owner=self.request.user)
 
-        try:
-            limit = int(request.query_params.get("limit", 10))
-            if limit < 1:
-                limit = 1
-            elif limit > 100:
-                limit = 100
-        except ValueError:
-            limit = 10
+    def perform_create(self, serializer):
+        """Automatically associate the task with the authenticated user."""
+        serializer.save(owner=self.request.user)
 
-        sort_by = request.query_params.get("sort_by", "created_at")
-        if sort_by not in ("created_at", "updated_at"):
-            sort_by = "created_at"
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginator = self.paginator
+            meta = {
+                "page": paginator.page.number,
+                "limit": paginator.get_page_size(request),
+                "total": paginator.page.paginator.count,
+                "totalPages": paginator.page.paginator.num_pages
+            }
+            return format_success_response(
+                data=serializer.data, 
+                message="Tasks retrieved successfully", 
+                meta=meta
+            )
 
-        db_sort_by = sort_by
-
-        order = request.query_params.get("order", "desc")
-        if order not in ("asc", "desc"):
-            order = "desc"
-
-        order_prefix = "-" if order == "desc" else ""
-
-        queryset = Task.objects.all().filter(owner=request.user)
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
-
-        queryset = queryset.order_by(f"{order_prefix}{db_sort_by}")
-
-        total = queryset.count()
-        start = (page - 1) * limit
-        end = start + limit
-        tasks = queryset[start:end]
-
-        serializer = TaskSerializer(tasks, many=True)
-
-        total_pages = (total + limit - 1) // limit if limit > 0 else 0
-        meta = {"page": page, "limit": limit, "total": total, "totalPages": total_pages}
-
+        serializer = self.get_serializer(queryset, many=True)
         return format_success_response(
-            data=serializer.data, message="Tasks retrieved successfully", meta=meta
+            data=serializer.data, 
+            message="Tasks retrieved successfully"
         )
 
-    def create(self, request):
-        """Creates a new task."""
-        serializer = TaskSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(
-            owner=request.user
-        )  # Associate the task with the authenticated user
-
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
         return format_success_response(
-            data=serializer.data,
+            data=response.data,
             message="Task created successfully",
             status_code=status.HTTP_201_CREATED,
         )
 
-    def retrieve(self, request, pk=None):
-        """Retrieves a single task by its ID."""
-        try:
-            task = Task.objects.get(pk=pk, owner=request.user)
-        except (Task.DoesNotExist, ValueError):
-            raise Http404("Task not found")
-
-        serializer = TaskSerializer(task)
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
         return format_success_response(
-            data=serializer.data, message="Task retrieved successfully"
+            data=response.data, 
+            message="Task retrieved successfully"
         )
 
-    def update(self, request, pk=None):
-        """Updates a specific task by its ID."""
-        try:
-            task = Task.objects.get(pk=pk, owner=request.user)
-        except (Task.DoesNotExist, ValueError):
-            raise Http404("Task not found")
-
-        serializer = TaskSerializer(task, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
         return format_success_response(
-            data=serializer.data, message="Task updated successfully"
+            data=response.data, 
+            message="Task updated successfully"
         )
 
-    def destroy(self, request, pk=None):
-        """Deletes a task by its ID."""
-        try:
-            task = Task.objects.get(pk=pk, owner=request.user)
-        except (Task.DoesNotExist, ValueError):
-            raise Http404("Task not found")
-
-        task.delete()
-
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
         return format_success_response(
-            data=None,
-            message="Task deleted successfully",
-            status_code=status.HTTP_200_OK,
+            data=None, 
+            message="Task deleted successfully", 
+            status_code=status.HTTP_200_OK
         )
