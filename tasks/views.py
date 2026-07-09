@@ -37,7 +37,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
-        
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             paginator = self.paginator
@@ -45,18 +45,15 @@ class TaskViewSet(viewsets.ModelViewSet):
                 "page": paginator.page.number,
                 "limit": paginator.get_page_size(request),
                 "total": paginator.page.paginator.count,
-                "totalPages": paginator.page.paginator.num_pages
+                "totalPages": paginator.page.paginator.num_pages,
             }
             return format_success_response(
-                data=serializer.data, 
-                message="Tasks retrieved successfully", 
-                meta=meta
+                data=serializer.data, message="Tasks retrieved successfully", meta=meta
             )
 
         serializer = self.get_serializer(queryset, many=True)
         return format_success_response(
-            data=serializer.data, 
-            message="Tasks retrieved successfully"
+            data=serializer.data, message="Tasks retrieved successfully"
         )
 
     def create(self, request, *args, **kwargs):
@@ -70,21 +67,19 @@ class TaskViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         return format_success_response(
-            data=response.data, 
-            message="Task retrieved successfully"
+            data=response.data, message="Task retrieved successfully"
         )
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         return format_success_response(
-            data=response.data, 
-            message="Task updated successfully"
+            data=response.data, message="Task updated successfully"
         )
 
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return format_success_response(
-            data=None, 
-            message="Task deleted successfully", 
-            status_code=status.HTTP_200_OK
+            data=None,
+            message="Task deleted successfully",
+            status_code=status.HTTP_200_OK,
         )
