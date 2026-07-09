@@ -1,10 +1,11 @@
 # To-Do API
 
 ## Overview
-This project is a lightweight, basic To-Do API built with Django REST Framework (DRF). It provides full CRUD operations for managing tasks. The API is designed with strict validation rules and uniform JSON response formatting to ensure predictability and ease of use.
+This project is a lightweight To-Do API built with Django REST Framework (DRF). It provides full CRUD operations for managing tasks, as well as JWT-based user authentication. The API is designed with strict validation rules, uniform JSON response formatting, and uses PostgreSQL as its database.
 
 ## Setup Instructions
-To run this project locally, ensure you have Python 3 installed.
+
+The easiest and recommended way to run the project is using Docker.
 
 1. **Clone the repository:**
    ```bash
@@ -12,62 +13,73 @@ To run this project locally, ensure you have Python 3 installed.
    cd todoapi
    ```
 
-2. **Activate the virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+2. **Configure Environment Variables:**
+   Ensure your `.env` file in the root directory is populated with your database and Django credentials. (You can copy from `.env.example` if it exists):
+   ```ini
+   POSTGRES_DB=propertydb
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=change_me_to_a_strong_password
+   POSTGRES_HOST=127.0.0.1
+   POSTGRES_PORT=5432
+   
+   DJANGO_SECRET_KEY=your_secret_key
+   DJANGO_DEBUG=True
+   DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
    ```
 
-3. **Install dependencies:**
+3. **Run with Docker Compose:**
    ```bash
-   pip install -r requirements.txt
+   docker-compose up -d --build
    ```
-
-4. **Run the development server:**
-   ```bash
-   python manage.py runserver
-   ```
-   The API will be available at `http://127.0.0.1:8000/`.
+   The API will be available at `http://localhost:8000/`. Docker will automatically handle the PostgreSQL database creation and run Django migrations on startup.
 
 ## Endpoints Reference
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `GET` | `/tasks` | Retrieve a paginated, sortable, and filterable list of tasks. |
-| `POST` | `/tasks` | Create a new task. |
-| `GET` | `/tasks/<id>` | Retrieve a specific task by its ID. |
-| `PUT` | `/tasks/<id>` | Partially update a specific task by its ID. |
-| `DELETE`| `/tasks/<id>` | Delete a specific task by its ID. |
+| Method | Path | Purpose | Auth Required |
+|--------|------|---------|---------------|
+| `POST` | `/api/v1/register/` | Register a new user. | No |
+| `POST` | `/api/v1/login/` | Obtain JWT access & refresh tokens. | No |
+| `GET`  | `/api/v1/tasks/` | Retrieve a paginated, sortable list of tasks. | Yes |
+| `POST` | `/api/v1/tasks/` | Create a new task. | Yes |
+| `GET`  | `/api/v1/tasks/<id>/` | Retrieve a specific task by its ID. | Yes |
+| `PUT`  | `/api/v1/tasks/<id>/` | Partially update a specific task by its ID. | Yes |
+| `DELETE`| `/api/v1/tasks/<id>/` | Delete a specific task by its ID. | Yes |
 
 ## cURL Examples
 
-### 1. View all tasks
+### 1. Register a User
 ```bash
-curl -X GET "http://127.0.0.1:8000/tasks?status=pending&page=1&limit=5&sort_by=createdAt&order=desc"
+curl -X POST "http://127.0.0.1:8000/api/v1/register/" \
+     -H "Content-Type: application/json" \
+     -d '{"username": "testuser", "email": "test@example.com", "password": "mypassword123"}'
 ```
 
-### 2. Create a new task
+### 2. Login (Get Token)
 ```bash
-curl -X POST "http://127.0.0.1:8000/tasks" \
+curl -X POST "http://127.0.0.1:8000/api/v1/login/" \
+     -H "Content-Type: application/json" \
+     -d '{"username": "testuser", "password": "mypassword123"}'
+```
+*Note: Copy the `access` token returned here to use in the `Authorization` header for the next requests.*
+
+### 3. Create a new task
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/tasks/" \
+     -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
      -H "Content-Type: application/json" \
      -d '{"title": "Buy groceries", "description": "Milk, Eggs, Bread"}'
 ```
 
-### 3. View task by ID
+### 4. View all tasks (with filters & pagination)
 ```bash
-curl -X GET "http://127.0.0.1:8000/tasks/1"
-```
-
-### 4. Update task by ID (Partial Update)
-```bash
-curl -X PUT "http://127.0.0.1:8000/tasks/1" \
-     -H "Content-Type: application/json" \
-     -d '{"status": "done"}'
+curl -X GET "http://127.0.0.1:8000/api/v1/tasks/?status=pending&page=1&limit=5&ordering=-created_at" \
+     -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
 ```
 
 ### 5. Delete task by ID
 ```bash
-curl -X DELETE "http://127.0.0.1:8000/tasks/1"
+curl -X DELETE "http://127.0.0.1:8000/api/v1/tasks/1/" \
+     -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
 ```
 
 ## Response Format
@@ -84,8 +96,8 @@ The API follows a standardized response format for both successes and errors.
       "title": "Buy groceries",
       "description": "Milk, Eggs, Bread",
       "status": "pending",
-      "createdAt": "2023-10-01T12:00:00Z",
-      "updatedAt": "2023-10-01T12:00:00Z"
+      "created_at": "2023-10-01T12:00:00Z",
+      "updated_at": "2023-10-01T12:00:00Z",
     }
   ],
   "meta": {
@@ -104,14 +116,9 @@ The API follows a standardized response format for both successes and errors.
   "success": false,
   "message": "Validation Error",
   "errors": {
-    "title": ["This field may not be blank."]
+    "title": [
+      "This field may not be blank."
+    ]
   }
 }
 ```
-
-## In-Memory Storage Behavior
-This API intentionally bypasses a traditional relational database (like PostgreSQL or SQLite) in favor of thread-safe in-memory storage. 
-
-- **Volatility:** All tasks are stored in memory (`InMemoryTaskStore`) using a Python dictionary. **This means that all data is completely lost when the server is restarted.**
-- **Thread Safety:** The storage mechanism utilizes Python's `threading.Lock` to ensure that concurrent read/write operations (like auto-incrementing IDs or modifying tasks) are safe and avoid race conditions.
-- **Constraints:** Because there is no ORM/QuerySet, filtering, sorting, and pagination logic are handled entirely via Python lists and slices in the application layer.
