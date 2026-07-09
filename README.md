@@ -72,11 +72,19 @@ curl -X POST "http://127.0.0.1:8000/api/v1/tasks/" \
 
 ### 4. View all tasks (with filters & pagination)
 ```bash
-curl -X GET "http://127.0.0.1:8000/api/v1/tasks/?status=pending&page=1&limit=5&ordering=-created_at" \
+curl -X GET "http://127.0.0.1:8000/api/v1/tasks/?status=pending&page=1&limit=5&sort_by=created_at&order=desc" \
      -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
 ```
 
-### 5. Delete task by ID
+### 5. Update task by ID 
+```bash
+curl -X PUT "http://127.0.0.1:8000/api/v1/tasks/1/" \
+     -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{"title":"Walk in the lake with my dog", "status": "done"}'
+```
+
+### 6. Delete task by ID
 ```bash
 curl -X DELETE "http://127.0.0.1:8000/api/v1/tasks/1/" \
      -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"

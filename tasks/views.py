@@ -1,6 +1,5 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -21,10 +20,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = TaskPagination
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ["status"]
-    ordering_fields = ["created_at", "updated_at"]
-    ordering = ["-created_at"]
 
     def get_queryset(self):
         """Restrict tasks to only those owned by the authenticated user."""
@@ -33,6 +30,17 @@ class TaskViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Automatically associate the task with the authenticated user."""
         serializer.save(owner=self.request.user)
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        sort_by = self.request.query_params.get("sort_by", "created_at")
+        order = self.request.query_params.get("order", "desc")
+
+        if sort_by in ["created_at", "updated_at"]:
+            prefix = "-" if order.lower() == "desc" else ""
+            queryset = queryset.order_by(f"{prefix}{sort_by}")
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
