@@ -1,11 +1,39 @@
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import APIException
 from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
+import requests
+import logging
 
 from todoapi.utils import format_success_response
 from .serializers import TaskSerializer
 from .models import Task
+
+logger = logging.getLogger(__name__)
+
+
+class ServiceUnavailable(APIException):
+    status_code = 502
+    default_detail = "AI service is temporarily unavailable."
+    default_code = "service_unavailable"
+
+
+class GatewayTimeout(APIException):
+    status_code = 504
+    default_detail = "AI service request timed out."
+    default_code = "gateway_timeout"
+
+
+class GenerateDescriptionMinThrottle(UserRateThrottle):
+    scope = "generate_description_min"
+
+
+class GenerateDescriptionDayThrottle(UserRateThrottle):
+    scope = "generate_description_day"
 
 
 class TaskPagination(PageNumberPagination):
@@ -22,6 +50,11 @@ class TaskViewSet(viewsets.ModelViewSet):
     pagination_class = TaskPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["status"]
+
+    def get_throttles(self):
+        if self.action == "generate_description":
+            return [GenerateDescriptionMinThrottle(), GenerateDescriptionDayThrottle()]
+        return super().get_throttles()
 
     def get_queryset(self):
         """Restrict tasks to only those owned by the authenticated user."""
@@ -91,3 +124,62 @@ class TaskViewSet(viewsets.ModelViewSet):
             message="Task deleted successfully",
             status_code=status.HTTP_200_OK,
         )
+
+    @action(detail=True, methods=["post"], url_path="generate-description")
+    def generate_description(self, request, pk=None):
+        task = self.get_object()
+
+        # Securely retrieve API Key
+        api_key = getattr(settings, "GEMINI_API_KEY", None)
+        if not api_key:
+            logger.error("GEMINI_API_KEY is not configured.")
+            raise APIException(detail="Gemini API key is not configured.")
+
+        title = task.title
+        desc = task.description or ""
+
+        if not desc:
+            prompt = f"Generate a two-sentence description for a task with the title: '{title}'."
+        else:
+            prompt = f"Refine and rewrite the following task description into exactly two sentences. Task title: '{title}'. Existing description: '{desc}'."
+
+        prompt += "\n\nCRITICAL: The response MUST be exactly two sentences long. Do not include markdown formatting, prefix, or other text. Return ONLY the description."
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            if response.status_code != 200:
+                logger.error(f"Gemini API returned error {response.status_code}")
+                raise ServiceUnavailable(
+                    detail="Failed to generate description from AI service."
+                )
+
+            data = response.json()
+
+            # Validation
+            try:
+                generated_text = data["candidates"][0]["content"]["parts"][0][
+                    "text"
+                ].strip()
+                if not generated_text:
+                    raise ValueError("Empty AI output")
+            except (KeyError, IndexError, ValueError):
+                logger.error("Failed to parse Gemini response structure.")
+                raise ServiceUnavailable(
+                    detail="Received invalid response format from AI service."
+                )
+
+            return format_success_response(
+                data={"description": generated_text},
+                message="Description generated successfully",
+            )
+
+        except requests.exceptions.Timeout:
+            logger.error("Gemini API request timed out.")
+            raise GatewayTimeout(detail="The request to the AI service timed out.")
+        except requests.exceptions.RequestException as err:
+            # Secure logging: do not print the exception representation (could contain the key)
+            logger.error(f"Gemini API connection error: {type(err).__name__}")
+            raise ServiceUnavailable(detail="Could not connect to the AI service.")
