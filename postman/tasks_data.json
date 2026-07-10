@@ -1,0 +1,249 @@
+[
+  {
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread, and fruits.",
+    "status": "pending"
+  },
+  {
+    "title": "Do laundry",
+    "description": "",
+    "status": "done"
+  },
+  {
+    "title": "Pay electricity bill",
+    "status": "pending"
+  },
+  {
+    "title": "Clean the kitchen",
+    "description": "Wipe down counters and mop the floor.",
+    "status": "done"
+  },
+  {
+    "title": "Walk the dog",
+    "description": "Take Buster to the park for 30 mins.",
+    "status": "pending"
+  },
+  {
+    "title": "Read a book",
+    "status": "done"
+  },
+  {
+    "title": "Reply to emails",
+    "description": "Clear out the primary inbox.",
+    "status": "pending"
+  },
+  {
+    "title": "Water the plants",
+    "description": "",
+    "status": "done"
+  },
+  {
+    "title": "Call mom",
+    "description": "Catch up and ask about her weekend.",
+    "status": "pending"
+  },
+  {
+    "title": "Take out the trash",
+    "status": "done"
+  },
+  {
+    "title": "Schedule dentist appointment",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Workout",
+    "description": "Upper body strength training.",
+    "status": "done"
+  },
+  {
+    "title": "Meal prep for the week",
+    "description": "Cook rice, chicken, and roast vegetables.",
+    "status": "pending"
+  },
+  {
+    "title": "Organize closet",
+    "status": "done"
+  },
+  {
+    "title": "Vacuum the living room",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Wash the car",
+    "description": "Interior and exterior wash.",
+    "status": "done"
+  },
+  {
+    "title": "Update resume",
+    "description": "Add recent project achievements.",
+    "status": "pending"
+  },
+  {
+    "title": "Buy birthday gift for Sarah",
+    "status": "done"
+  },
+  {
+    "title": "Renew car insurance",
+    "description": "Compare quotes before renewing.",
+    "status": "pending"
+  },
+  {
+    "title": "Meditate",
+    "description": "10 minutes of mindfulness.",
+    "status": "done"
+  },
+  {
+    "title": "Fix leaky faucet",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Return library books",
+    "description": "Due date is tomorrow.",
+    "status": "done"
+  },
+  {
+    "title": "Clean the bathroom",
+    "status": "pending"
+  },
+  {
+    "title": "Plan weekend trip",
+    "description": "Look up hotels and activities.",
+    "status": "done"
+  },
+  {
+    "title": "Go for a run",
+    "description": "5k run around the neighborhood.",
+    "status": "pending"
+  },
+  {
+    "title": "Review bank statements",
+    "status": "done"
+  },
+  {
+    "title": "Dust the shelves",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Cook dinner",
+    "description": "Try the new pasta recipe.",
+    "status": "done"
+  },
+  {
+    "title": "Buy stamps",
+    "status": "pending"
+  },
+  {
+    "title": "Check mail",
+    "description": "",
+    "status": "done"
+  },
+  {
+    "title": "Empty dishwasher",
+    "description": "Put away clean dishes.",
+    "status": "pending"
+  },
+  {
+    "title": "Iron shirts",
+    "description": "Prep clothes for the work week.",
+    "status": "done"
+  },
+  {
+    "title": "Change bed sheets",
+    "status": "pending"
+  },
+  {
+    "title": "Mow the lawn",
+    "description": "Cut grass and trim edges.",
+    "status": "done"
+  },
+  {
+    "title": "Buy dog food",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Backup laptop files",
+    "description": "Sync to external hard drive.",
+    "status": "done"
+  },
+  {
+    "title": "Clean out fridge",
+    "description": "Throw away expired items.",
+    "status": "pending"
+  },
+  {
+    "title": "Write journal entry",
+    "status": "done"
+  },
+  {
+    "title": "Practice guitar",
+    "description": "Learn the chords for the new song.",
+    "status": "pending"
+  },
+  {
+    "title": "Sort recycling",
+    "description": "",
+    "status": "done"
+  },
+  {
+    "title": "Wash windows",
+    "description": "Use glass cleaner on all downstairs windows.",
+    "status": "pending"
+  },
+  {
+    "title": "Buy coffee beans",
+    "status": "done"
+  },
+  {
+    "title": "Check tire pressure",
+    "description": "Ensure all tires are at 32 psi.",
+    "status": "pending"
+  },
+  {
+    "title": "Trim fingernails",
+    "status": "done"
+  },
+  {
+    "title": "Charge power banks",
+    "description": "Prepare for the upcoming trip.",
+    "status": "pending"
+  },
+  {
+    "title": "Defrost chicken",
+    "description": "",
+    "status": "done"
+  },
+  {
+    "title": "Update software",
+    "description": "Install OS updates on phone and laptop.",
+    "status": "pending"
+  },
+  {
+    "title": "Sweep the porch",
+    "status": "done"
+  },
+  {
+    "title": "Wipe down monitor",
+    "description": "Use microfiber cloth.",
+    "status": "pending"
+  },
+  {
+    "title": "Prepare lunchbox",
+    "description": "Pack sandwiches and fruit.",
+    "status": "done"
+  },
+  {
+    "title": "Fill up gas tank",
+    "description": "",
+    "status": "pending"
+  },
+  {
+    "title": "Replace lightbulb",
+    "description": "Hallway light is out.",
+    "status": "done"
+  }
+]
