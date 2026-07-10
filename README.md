@@ -14,9 +14,9 @@ The easiest and recommended way to run the project is using Docker.
    ```
 
 2. **Configure Environment Variables:**
-   Ensure your `.env` file in the root directory is populated with your database and Django credentials. (You can copy from `.env.example` if it exists):
+   Ensure your `.env` file in the root directory is populated with your database and Django credentials. (You can copy from `.env.example`):
    ```ini
-   POSTGRES_DB=propertydb
+   POSTGRES_DB=taskdb
    POSTGRES_USER=postgres
    POSTGRES_PASSWORD=change_me_to_a_strong_password
    POSTGRES_HOST=127.0.0.1
@@ -25,6 +25,7 @@ The easiest and recommended way to run the project is using Docker.
    DJANGO_SECRET_KEY=your_secret_key
    DJANGO_DEBUG=True
    DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+   GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
 3. **Run with Docker Compose:**
@@ -39,11 +40,13 @@ The easiest and recommended way to run the project is using Docker.
 |--------|------|---------|---------------|
 | `POST` | `/api/v1/register/` | Register a new user. | No |
 | `POST` | `/api/v1/login/` | Obtain JWT access & refresh tokens. | No |
+| `POST` | `/api/v1/token/refresh/` | Refresh JWT access token. | No |
 | `GET`  | `/api/v1/tasks/` | Retrieve a paginated, sortable list of tasks. | Yes |
 | `POST` | `/api/v1/tasks/` | Create a new task. | Yes |
 | `GET`  | `/api/v1/tasks/<id>/` | Retrieve a specific task by its ID. | Yes |
 | `PUT`  | `/api/v1/tasks/<id>/` | Partially update a specific task by its ID. | Yes |
 | `DELETE`| `/api/v1/tasks/<id>/` | Delete a specific task by its ID. | Yes |
+| `POST` | `/api/v1/tasks/<id>/generate-description/` | Generate an AI description for a task using Gemini. | Yes |
 
 ## cURL Examples
 
@@ -87,6 +90,12 @@ curl -X PUT "http://127.0.0.1:8000/api/v1/tasks/1/" \
 ### 6. Delete task by ID
 ```bash
 curl -X DELETE "http://127.0.0.1:8000/api/v1/tasks/1/" \
+     -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
+```
+
+### 7. Generate Task Description (AI)
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/tasks/1/generate-description/" \
      -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
 ```
 
