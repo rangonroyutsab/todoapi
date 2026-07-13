@@ -27,3 +27,7 @@ db.sqlite3-journal
 
 # Ruff
 .ruff_cache/
+
+# SonarQube
+.sonar/
+.sonarlint/
