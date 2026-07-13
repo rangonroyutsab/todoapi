@@ -181,5 +181,5 @@ class TaskViewSet(viewsets.ModelViewSet):
             raise GatewayTimeout(detail="The request to the AI service timed out.")
         except requests.exceptions.RequestException as err:
             # Secure logging: do not print the exception representation (could contain the key)
-            logger.error(f"Gemini API connection error: {type(err).__name__}")
+            logging.exception(f"Gemini API connection error: {type(err).__name__}")
             raise ServiceUnavailable(detail="Could not connect to the AI service.")
