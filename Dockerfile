@@ -8,19 +8,18 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    addgroup --system django && \ 
-    adduser --system --ingroup django django && \
-    mkdir -p /app/static && \
-    chown -R django:django /app/static
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --only-binary :all: --no-cache-dir --require-hashes -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+COPY manage.py .
+COPY todoapi/ todoapi/
+COPY tasks/ tasks/
+COPY users/ users/
 
-COPY  ./todoapi/ /app/todoapi/
-COPY  ./users/ /app/users/
-COPY  ./manage.py /app/
+RUN addgroup --system django && adduser --system --ingroup django django \
+    && mkdir -p /app/static && chown -R django:django /app
 
 USER django
 
