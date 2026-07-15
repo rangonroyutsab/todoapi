@@ -59,8 +59,9 @@ class TestLoginView:
         response = api_client.post(url, payload)
 
         assert response.status_code == 200
-        assert "access" in response.data
-        assert "refresh" in response.data
+        assert response.data["success"] is True
+        assert "access" in response.data["data"]
+        assert "refresh" in response.data["data"]
 
     def test_login_invalid_credentials(self, api_client, user_factory):
         user_factory(username="testuser")
