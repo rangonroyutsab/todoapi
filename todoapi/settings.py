@@ -34,7 +34,13 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG") == "True"
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",")
+_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS")
+if not _allowed_hosts:
+    raise ValueError(
+        "DJANGO_ALLOWED_HOSTS is not set. Add it to your .env file "
+        "(e.g. DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1)."
+    )
+ALLOWED_HOSTS = _allowed_hosts.split(",")
 
 
 # Application definition
@@ -157,7 +163,6 @@ REST_FRAMEWORK = {
     },
 }
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 SIMPLE_JWT = {
@@ -171,5 +176,3 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is not set. Add it to your .env file.")

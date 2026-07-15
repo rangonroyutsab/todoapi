@@ -8,13 +8,11 @@ djangorestframework_simplejwt==5.5.1
 psycopg[binary]==3.3.4
 python-dotenv==1.2.2
 
-# AI & Data Validation
-pydantic==2.13.4
-google-genai==2.11.0
-
 # HTTP & Utilities
 requests==2.34.2
-tenacity==9.1.4
+
+# Production Server
+gunicorn==23.0.0
 
 # Development 
 ruff==0.15.20
