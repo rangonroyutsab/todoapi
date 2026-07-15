@@ -1,6 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
-from users.tests.factories import UserFactory
+
+from testing.factories import UserFactory
 
 
 @pytest.fixture
