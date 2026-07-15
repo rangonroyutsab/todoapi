@@ -79,8 +79,9 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
 
+        meta = None
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            queryset = page
             paginator = self.paginator
             meta = {
                 "page": paginator.page.number,
@@ -88,13 +89,11 @@ class TaskViewSet(viewsets.ModelViewSet):
                 "total": paginator.page.paginator.count,
                 "totalPages": paginator.page.paginator.num_pages,
             }
-            return format_success_response(
-                data=serializer.data, message="Tasks retrieved successfully", meta=meta
-            )
+            
 
         serializer = self.get_serializer(queryset, many=True)
         return format_success_response(
-            data=serializer.data, message="Tasks retrieved successfully"
+            data=serializer.data, message="Tasks retrieved successfully", meta=meta
         )
 
     def create(self, request, *args, **kwargs):
