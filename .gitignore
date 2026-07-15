@@ -31,3 +31,8 @@ db.sqlite3-journal
 # SonarQube
 .sonar/
 .sonarlint/
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/

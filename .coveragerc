@@ -1,0 +1,8 @@
+[run]
+omit =
+    */venv/*
+    */migrations/*
+    manage.py
+    todoapi/settings.py
+    todoapi/wsgi.py
+    todoapi/asgi.py
