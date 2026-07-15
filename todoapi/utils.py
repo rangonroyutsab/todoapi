@@ -38,11 +38,15 @@ def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     if response is not None:
-        message = "An error occurred"
-        if response.status_code == 400:
-            message = "Validation Error"
-        elif response.status_code == 404:
-            message = "Not Found"
+        STATUS_MESSAGE_MAP = {
+            400: "Validation Error",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
+            405: "Method Not Allowed",
+            429: "Too Many Requests",
+        }
+        message = STATUS_MESSAGE_MAP.get(response.status_code, "An error occurred")
 
         custom_response_data = {
             "success": False,

@@ -1,5 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 
 from .serializers import UserRegistrationSerializer
@@ -22,4 +23,15 @@ class RegisterView(generics.CreateAPIView):
             data=serializer.data,
             message="User registered successfully",
             status_code=status.HTTP_201_CREATED,
+        )
+
+
+class LoginView(TokenObtainPairView):
+    """Custom login view that wraps JWT tokens in the standard response envelope."""
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        return format_success_response(
+            data=response.data,
+            message="Login successful",
         )
