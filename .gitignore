@@ -37,3 +37,4 @@ db.sqlite3-journal
 .coverage
 htmlcov/
 coverage.xml
+nosetests.xml
