@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>TodoAPI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="font-headline-md font-bold" style="color: var(--primary);">TodoAPI</h1>
+        </div>
+        
+        {% if user.is_authenticated %}
+        <div class="sidebar-user">
+            <div>
+                <p style="font-weight: 600;">{{ user.username }}</p>
+                <p class="label-caps text-secondary">{{ user.email }}</p>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="{% url 'task_list' %}" class="nav-item active">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="label-caps">Tasks</span>
+            </a>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="nav-item" style="border:none; width:100%; text-align:left; font-family:inherit; font-size:inherit; background:none;">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="label-caps">Logout</span>
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="sidebar-nav">
+            <a href="{% url 'login' %}" class="nav-item">
+                <span class="material-symbols-outlined">login</span>
+                <span class="label-caps">Login</span>
+            </a>
+            <a href="{% url 'register' %}" class="nav-item">
+                <span class="material-symbols-outlined">person_add</span>
+                <span class="label-caps">Register</span>
+            </a>
+        </div>
+        {% endif %}
+    </nav>
+    <main class="main-content">
+        {% block content %}
+        {% endblock content %}
+    </main>
+    {% block scripts %}
+    {% endblock scripts %}
+</body>
+</html>

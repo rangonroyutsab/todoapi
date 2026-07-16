@@ -1,0 +1,139 @@
+:root {
+  --surface: #fbf8ff;
+  --surface-lowest: #ffffff;
+  --surface-container-low: #f4f2fd;
+  --surface-variant: #e3e1ec;
+  
+  --primary: #000000;
+  --on-primary: #ffffff;
+  
+  --on-surface: #1a1b22;
+  --secondary: #5d5f5f;
+  
+  --error: #ba1a1a;
+  
+  --outline: #e4e4e7;
+  --outline-hover: #000000;
+  
+  --unit: 4px;
+  --stack-sm: 8px;
+  --stack-md: 16px;
+  --stack-lg: 32px;
+  --gutter: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Geist', sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Typography */
+h1 { font-size: 32px; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+h2 { font-size: 24px; font-weight: 600; line-height: 1.2; }
+p, span, div { font-size: 16px; line-height: 1.6; }
+.label-caps { font-size: 12px; font-weight: 600; line-height: 1; letter-spacing: 0.05em; text-transform: uppercase; }
+.text-secondary { color: var(--secondary); }
+
+/* Layout */
+.sidebar {
+  width: 256px;
+  background-color: var(--surface-lowest);
+  border-right: 1px solid var(--outline);
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--stack-lg);
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 256px;
+  padding: 40px;
+}
+
+.sidebar-header { padding: 0 var(--stack-lg); margin-bottom: var(--stack-lg); }
+.sidebar-user {
+  padding: var(--stack-md);
+  display: flex;
+  align-items: center;
+  gap: var(--stack-sm);
+  margin-bottom: var(--stack-lg);
+  border: 1px solid var(--surface-variant);
+  border-radius: 0;
+  margin-left: var(--stack-md);
+  margin-right: var(--stack-md);
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: var(--unit); padding: 0 var(--stack-sm); }
+.nav-item {
+  display: flex; align-items: center; gap: var(--stack-sm);
+  padding: var(--stack-sm) var(--stack-md);
+  cursor: pointer; text-decoration: none; color: var(--secondary);
+  border-radius: 0; transition: background-color 0.2s ease-in-out;
+}
+.nav-item:hover { background-color: var(--surface-container-low); }
+.nav-item.active { background-color: #e4e4e7; color: var(--primary); font-weight: 600; }
+
+/* Components */
+.card {
+  background-color: var(--surface-lowest);
+  border: 1px solid var(--outline);
+  border-radius: 0;
+  padding: var(--stack-md);
+  margin-bottom: var(--stack-md);
+}
+.btn-primary {
+  background-color: var(--primary); color: var(--on-primary);
+  border: none; padding: var(--stack-sm) var(--stack-md);
+  font-weight: 600; cursor: pointer; border-radius: 0;
+  transition: background-color 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--unit);
+}
+.btn-primary:hover { background-color: #27272a; }
+.btn-primary:disabled { background-color: var(--secondary); cursor: not-allowed; }
+.btn-secondary {
+  background-color: transparent; color: var(--primary);
+  border: 1px solid var(--primary); padding: var(--stack-sm) var(--stack-md);
+  font-weight: 600; cursor: pointer; border-radius: 0;
+  transition: background-color 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--unit);
+}
+.btn-secondary:hover { background-color: var(--surface-container-low); }
+
+/* Forms */
+.form-group { margin-bottom: var(--stack-md); display: flex; flex-direction: column; gap: var(--stack-sm); }
+.input-field, .textarea-field {
+  border: 1px solid var(--outline); padding: var(--stack-sm);
+  border-radius: 0; font-family: 'Geist', sans-serif; font-size: 16px; outline: none; width: 100%;
+}
+.input-field:focus, .textarea-field:focus {
+  border: 2px solid var(--primary); padding: calc(var(--stack-sm) - 1px);
+}
+.textarea-field { min-height: 120px; resize: vertical; }
+
+/* Chips */
+.chip { padding: 4px 8px; font-size: 12px; font-weight: 600; border-radius: 0; display: inline-block; text-transform: uppercase; }
+.chip-pending { background-color: #fee2e2; color: #991b1b; }
+.chip-done { background-color: #dcfce7; color: #166534; }
+
+/* Utilities */
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.align-center { align-items: center; }
+.gap-sm { gap: var(--stack-sm); }
+.gap-md { gap: var(--stack-md); }
+.mb-md { margin-bottom: var(--stack-md); }
+.mb-lg { margin-bottom: var(--stack-lg); }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }

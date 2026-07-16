@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "tasks",
     "users",
+    "frontend",
 ]
 
 MIDDLEWARE = [
@@ -142,6 +143,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend' / 'static',
+]
 
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "todoapi.utils.custom_exception_handler",

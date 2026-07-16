@@ -13,10 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY manage.py .
-COPY todoapi/ todoapi/
-COPY tasks/ tasks/
-COPY users/ users/
+COPY . .
 
 RUN addgroup --system django && adduser --system --ingroup django django \
     && mkdir -p /app/static && chown -R django:django /app

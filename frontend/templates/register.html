@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 40px auto;">
+    <h2 class="mb-md">Register</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label class="label-caps" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <span style="color: var(--error); font-size: 14px;">{{ field.errors.0 }}</span>
+            {% endif %}
+            {% if field.help_text %}
+                <span style="color: var(--secondary); font-size: 12px; margin-top: 4px;">{{ field.help_text|safe }}</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--stack-sm);">Create Account</button>
+    </form>
+    
+    <p style="margin-top: var(--stack-md); text-align: center;">
+        Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); font-weight: 600;">Login here</a>
+    </p>
+</div>
+{% endblock %}

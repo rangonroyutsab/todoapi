@@ -8,4 +8,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(f"{BASE_URL}", include("users.urls")),
     path(f"{BASE_URL}", include("tasks.urls")),
+    path("", include("frontend.urls")),
 ]
