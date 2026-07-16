@@ -3,6 +3,8 @@
 ## Overview
 This project is a lightweight To-Do API built with Django REST Framework (DRF). It provides full CRUD operations for managing tasks, as well as JWT-based user authentication. The API is designed with strict validation rules, uniform JSON response formatting, and uses PostgreSQL as its database.
 
+
+
 ## Setup Instructions
 
 The easiest and recommended way to run the project is using Docker.
@@ -40,13 +42,18 @@ The easiest and recommended way to run the project is using Docker.
 |--------|------|---------|---------------|
 | `POST` | `/api/v1/register/` | Register a new user. | No |
 | `POST` | `/api/v1/login/` | Obtain JWT access & refresh tokens. | No |
-| `POST` | `/api/v1/token/refresh/` | Refresh JWT access token. | No |
 | `GET`  | `/api/v1/tasks/` | Retrieve a paginated, sortable list of tasks. | Yes |
 | `POST` | `/api/v1/tasks/` | Create a new task. | Yes |
 | `GET`  | `/api/v1/tasks/<id>/` | Retrieve a specific task by its ID. | Yes |
 | `PUT`  | `/api/v1/tasks/<id>/` | Partially update a specific task by its ID. | Yes |
 | `DELETE`| `/api/v1/tasks/<id>/` | Delete a specific task by its ID. | Yes |
 | `POST` | `/api/v1/tasks/<id>/generate-description/` | Generate an AI description for a task using Gemini. | Yes |
+
+## Rate Limiting (Throttling)
+The API implements rate limiting to prevent abuse:
+- **Anonymous Users**: 100 requests per day.
+- **Authenticated Users**: 1,000 requests per day.
+- **AI Description Generation**: 10 requests per minute and 500 requests per day per user.
 
 ## cURL Examples
 
@@ -114,7 +121,7 @@ The API follows a standardized response format for both successes and errors.
       "description": "Milk, Eggs, Bread",
       "status": "pending",
       "created_at": "2023-10-01T12:00:00Z",
-      "updated_at": "2023-10-01T12:00:00Z",
+      "updated_at": "2023-10-01T12:00:00Z"
     }
   ],
   "meta": {
