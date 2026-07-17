@@ -4,7 +4,6 @@ from tasks.serializers import TaskSerializer
 
 @pytest.mark.django_db
 def test_task_serializer_valid_data(user_factory):
-    user = user_factory()
     data = {"title": "Test Task", "description": "Desc"}
     serializer = TaskSerializer(data=data)
     assert serializer.is_valid()
