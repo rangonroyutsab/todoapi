@@ -5,7 +5,7 @@ from django.urls import reverse
 @pytest.mark.django_db
 class TestRegisterView:
     def test_register_user_success(self, api_client):
-        url = reverse("register")
+        url = reverse("api_register")
         payload = {
             "username": "newuser",
             "email": "new@test.com",
@@ -22,7 +22,7 @@ class TestRegisterView:
         # Create an existing user
         user_factory(username="existinguser")
 
-        url = reverse("register")
+        url = reverse("api_register")
         payload = {"username": "existinguser", "password": "password123"}
         response = api_client.post(url, payload)
 
@@ -35,7 +35,7 @@ class TestRegisterView:
         mocker.patch(
             "users.views.RegisterView.perform_create", side_effect=Exception("DB Error")
         )
-        url = reverse("register")
+        url = reverse("api_register")
         payload = {
             "username": "failuser",
             "password": "password123",
@@ -54,7 +54,7 @@ class TestLoginView:
         # The factory uses "securepassword123" by default
         user_factory(username="testuser")
 
-        url = reverse("login")
+        url = reverse("api_login")
         payload = {"username": "testuser", "password": "securepassword123"}
         response = api_client.post(url, payload)
 
@@ -66,7 +66,7 @@ class TestLoginView:
     def test_login_invalid_credentials(self, api_client, user_factory):
         user_factory(username="testuser")
 
-        url = reverse("login")
+        url = reverse("api_login")
         payload = {"username": "testuser", "password": "wrongpassword"}
         response = api_client.post(url, payload)
 
@@ -74,7 +74,7 @@ class TestLoginView:
         assert "detail" in response.data["errors"]
 
     def test_login_missing_credentials(self, api_client):
-        url = reverse("login")
+        url = reverse("api_login")
         payload = {"username": "testuser"}
         response = api_client.post(url, payload)
 
