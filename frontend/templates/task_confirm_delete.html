@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card" style="max-width: 400px; margin: 40px auto; text-align: center;">
-    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--error); margin-bottom: var(--stack-md);">warning</span>
+<div class="card delete-card">
+    <span class="material-symbols-outlined icon-error-lg">warning</span>
     <h2 class="mb-sm">Delete Task?</h2>
     <p class="text-secondary mb-lg">Are you sure you want to delete "{{ object.title }}"? This action cannot be undone.</p>
     
     <form method="POST">
         {% csrf_token %}
-        <div class="flex gap-md" style="justify-content: center;">
+        <div class="flex gap-md justify-center">
             <a href="{% url 'task_update' object.id %}" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary" style="background-color: var(--error); color: white;">Yes, Delete</button>
+            <button type="submit" class="btn-primary btn-danger">Yes, Delete</button>
         </div>
     </form>
 </div>

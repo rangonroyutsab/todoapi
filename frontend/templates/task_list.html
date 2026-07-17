@@ -10,11 +10,11 @@
 </div>
 
 <!-- Filters & Sorting -->
-<div class="card mb-md" style="padding: var(--stack-sm) var(--stack-md);">
-    <form method="GET" class="flex align-center gap-md" style="flex-wrap: wrap;">
+<div class="card mb-md card-sm">
+    <form method="GET" class="flex align-center gap-md flex-wrap justify-between">
         <div class="flex align-center gap-sm">
             <label class="label-caps" for="status">Status:</label>
-            <select name="status" id="status" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
+            <select name="status" id="status" class="input-field input-field-sm" onchange="this.form.submit()">
                 <option value="">All</option>
                 <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
                 <option value="done" {% if current_status == 'done' %}selected{% endif %}>Done</option>
@@ -22,26 +22,8 @@
         </div>
         
         <div class="flex align-center gap-sm">
-            <label class="label-caps" for="sort_by">Sort By:</label>
-            <select name="sort_by" id="sort_by" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
-                <option value="created_at" {% if current_sort_by == 'created_at' %}selected{% endif %}>Date Created</option>
-                <option value="updated_at" {% if current_sort_by == 'updated_at' %}selected{% endif %}>Date Updated</option>
-                <option value="title" {% if current_sort_by == 'title' %}selected{% endif %}>Title</option>
-                <option value="status" {% if current_sort_by == 'status' %}selected{% endif %}>Status</option>
-            </select>
-        </div>
-        
-        <div class="flex align-center gap-sm">
-            <label class="label-caps" for="order">Order:</label>
-            <select name="order" id="order" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
-                <option value="desc" {% if current_order == 'desc' %}selected{% endif %}>Descending</option>
-                <option value="asc" {% if current_order == 'asc' %}selected{% endif %}>Ascending</option>
-            </select>
-        </div>
-        
-        <div class="flex align-center gap-sm">
-            <label class="label-caps" for="limit">Tasks Per Page:</label>
-            <select name="limit" id="limit" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
+            <label class="label-caps" for="limit">Page Size:</label>
+            <select name="limit" id="limit" class="input-field input-field-sm" onchange="this.form.submit()">
                 <option value="5" {% if current_limit == '5' %}selected{% endif %}>5</option>
                 <option value="10" {% if current_limit == '10' %}selected{% endif %}>10</option>
                 <option value="20" {% if current_limit == '20' %}selected{% endif %}>20</option>
@@ -53,26 +35,26 @@
 
 <!-- Task List -->
 {% if tasks %}
-    <div style="display: flex; flex-direction: column; gap: var(--stack-sm);">
+    <div class="task-list-container">
     {% for task in tasks %}
-        <div class="card" style="margin-bottom: 0;">
+        <div class="card mb-0">
             <div class="flex justify-between align-center mb-sm">
-                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">{{ task.title }}</h3>
+                <h3 class="task-title">{{ task.title }}</h3>
                 <span class="chip {% if task.status == 'done' %}chip-done{% else %}chip-pending{% endif %}">{{ task.status }}</span>
             </div>
             
             {% if task.description %}
-            <p class="text-secondary" style="margin-bottom: var(--stack-md);">{{ task.description|truncatechars:150 }}</p>
+            <p class="text-secondary mb-md">{{ task.description|truncatechars:150 }}</p>
             {% endif %}
             
-            <div class="flex justify-between align-center" style="border-top: 1px solid var(--outline); padding-top: var(--stack-sm); margin-top: var(--stack-md);">
-                <div class="flex" style="flex-direction: column; gap: 4px;">
-                    <span class="text-secondary" style="font-size: 12px;">Created: {{ task.created_at|date:"M d, Y H:i" }}</span>
-                    <span class="text-secondary" style="font-size: 12px;">Updated: {{ task.updated_at|date:"M d, Y H:i" }}</span>
+            <div class="flex justify-between align-center task-footer">
+                <div class="flex flex-col-gap-4">
+                    <span class="text-secondary text-xs">Created: {{ task.created_at|date:"M d, Y H:i" }}</span>
+                    <span class="text-secondary text-xs">Updated: {{ task.updated_at|date:"M d, Y H:i" }}</span>
                 </div>
                 <div class="flex gap-sm">
-                    <a href="{% url 'task_update' task.id %}" class="btn-secondary" style="padding: 4px 8px; font-size: 14px;">Edit</a>
-                    <a href="{% url 'task_delete' task.id %}" class="btn-secondary" style="padding: 4px 8px; font-size: 14px; color: var(--error); border-color: var(--error);">Delete</a>
+                    <a href="{% url 'task_update' task.id %}" class="btn-secondary btn-sm">Edit</a>
+                    <a href="{% url 'task_delete' task.id %}" class="btn-secondary btn-sm btn-outline-danger">Delete</a>
                 </div>
             </div>
         </div>
@@ -81,32 +63,32 @@
     
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="flex justify-between align-center" style="margin-top: var(--stack-lg);">
+    <div class="flex justify-between align-center mt-lg">
         <div>
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary" style="padding: 4px 12px;">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary btn-paginate">Previous</a>
             {% else %}
-                <button class="btn-secondary" disabled style="padding: 4px 12px; border-color: var(--outline); color: var(--secondary);">Previous</button>
+                <button class="btn-secondary" disabled class="btn-paginate">Previous</button>
             {% endif %}
         </div>
         
-        <span style="font-weight: 600; font-size: 14px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <span class="font-semibold-sm">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         
         <div>
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary" style="padding: 4px 12px;">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary btn-paginate">Next</a>
             {% else %}
-                <button class="btn-secondary" disabled style="padding: 4px 12px; border-color: var(--outline); color: var(--secondary);">Next</button>
+                <button class="btn-secondary" disabled class="btn-paginate">Next</button>
             {% endif %}
         </div>
     </div>
     {% endif %}
 {% else %}
-    <div class="card flex" style="align-items: center; justify-content: center; min-height: 200px; text-align: center;">
+    <div class="card flex empty-state">
         <div>
-            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--outline); margin-bottom: var(--stack-md);">fact_check</span>
-            <h3 style="margin-bottom: var(--stack-sm)">No tasks found</h3>
-            <p class="text-secondary" style="margin-bottom: var(--stack-md)">You don't have any tasks matching this criteria.</p>
+            <span class="material-symbols-outlined icon-empty">fact_check</span>
+            <h3 class="mb-sm">No tasks found</h3>
+            <p class="text-secondary mb-md">You don't have any tasks matching this criteria.</p>
             <a href="{% url 'task_create' %}" class="btn-primary">Create Task</a>
         </div>
     </div>

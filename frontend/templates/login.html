@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card" style="max-width: 400px; margin: 40px auto;">
+<div class="card auth-card">
     <h2 class="mb-md">Login</h2>
     
     {% if form.non_field_errors %}
-    <div style="color: var(--error); margin-bottom: var(--stack-md);">
+    <div class="error-container">
         {% for error in form.non_field_errors %}
             <p>{{ error }}</p>
         {% endfor %}
@@ -19,16 +19,16 @@
             <label class="label-caps" for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
             {% if field.errors %}
-                <span style="color: var(--error); font-size: 14px;">{{ field.errors.0 }}</span>
+                <span class="error-text">{{ field.errors.0 }}</span>
             {% endif %}
         </div>
         {% endfor %}
         
-        <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--stack-sm);">Sign In</button>
+        <button type="submit" class="btn-primary btn-block">Sign In</button>
     </form>
     
-    <p style="margin-top: var(--stack-md); text-align: center;">
-        Don't have an account? <a href="{% url 'register' %}" style="color: var(--primary); font-weight: 600;">Register here</a>
+    <p class="auth-links">
+        Don't have an account? <a href="{% url 'register' %}" class="link-primary">Register here</a>
     </p>
 </div>
 {% endblock %}
