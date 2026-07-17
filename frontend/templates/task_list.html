@@ -14,7 +14,7 @@
     <form method="GET" class="flex align-center gap-md" style="flex-wrap: wrap;">
         <div class="flex align-center gap-sm">
             <label class="label-caps" for="status">Status:</label>
-            <select name="status" id="status" class="input-field" style="width: auto; padding: 4px 8px;">
+            <select name="status" id="status" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
                 <option value="">All</option>
                 <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
                 <option value="done" {% if current_status == 'done' %}selected{% endif %}>Done</option>
@@ -23,7 +23,7 @@
         
         <div class="flex align-center gap-sm">
             <label class="label-caps" for="sort_by">Sort By:</label>
-            <select name="sort_by" id="sort_by" class="input-field" style="width: auto; padding: 4px 8px;">
+            <select name="sort_by" id="sort_by" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
                 <option value="created_at" {% if current_sort_by == 'created_at' %}selected{% endif %}>Date Created</option>
                 <option value="updated_at" {% if current_sort_by == 'updated_at' %}selected{% endif %}>Date Updated</option>
                 <option value="title" {% if current_sort_by == 'title' %}selected{% endif %}>Title</option>
@@ -33,13 +33,21 @@
         
         <div class="flex align-center gap-sm">
             <label class="label-caps" for="order">Order:</label>
-            <select name="order" id="order" class="input-field" style="width: auto; padding: 4px 8px;">
+            <select name="order" id="order" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
                 <option value="desc" {% if current_order == 'desc' %}selected{% endif %}>Descending</option>
                 <option value="asc" {% if current_order == 'asc' %}selected{% endif %}>Ascending</option>
             </select>
         </div>
         
-        <button type="submit" class="btn-secondary" style="padding: 4px 16px;">Apply</button>
+        <div class="flex align-center gap-sm">
+            <label class="label-caps" for="limit">Tasks Per Page:</label>
+            <select name="limit" id="limit" class="input-field" style="width: auto; padding: 4px 8px;" onchange="this.form.submit()">
+                <option value="5" {% if current_limit == '5' %}selected{% endif %}>5</option>
+                <option value="10" {% if current_limit == '10' %}selected{% endif %}>10</option>
+                <option value="20" {% if current_limit == '20' %}selected{% endif %}>20</option>
+                <option value="50" {% if current_limit == '50' %}selected{% endif %}>50</option>
+            </select>
+        </div>
     </form>
 </div>
 
@@ -58,9 +66,13 @@
             {% endif %}
             
             <div class="flex justify-between align-center" style="border-top: 1px solid var(--outline); padding-top: var(--stack-sm); margin-top: var(--stack-md);">
-                <span class="text-secondary" style="font-size: 12px;">Created: {{ task.created_at|date:"M d, Y" }}</span>
+                <div class="flex" style="flex-direction: column; gap: 4px;">
+                    <span class="text-secondary" style="font-size: 12px;">Created: {{ task.created_at|date:"M d, Y H:i" }}</span>
+                    <span class="text-secondary" style="font-size: 12px;">Updated: {{ task.updated_at|date:"M d, Y H:i" }}</span>
+                </div>
                 <div class="flex gap-sm">
                     <a href="{% url 'task_update' task.id %}" class="btn-secondary" style="padding: 4px 8px; font-size: 14px;">Edit</a>
+                    <a href="{% url 'task_delete' task.id %}" class="btn-secondary" style="padding: 4px 8px; font-size: 14px; color: var(--error); border-color: var(--error);">Delete</a>
                 </div>
             </div>
         </div>
@@ -72,7 +84,7 @@
     <div class="flex justify-between align-center" style="margin-top: var(--stack-lg);">
         <div>
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}" class="btn-secondary" style="padding: 4px 12px;">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary" style="padding: 4px 12px;">Previous</a>
             {% else %}
                 <button class="btn-secondary" disabled style="padding: 4px 12px; border-color: var(--outline); color: var(--secondary);">Previous</button>
             {% endif %}
@@ -82,7 +94,7 @@
         
         <div>
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}" class="btn-secondary" style="padding: 4px 12px;">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}&status={{ current_status }}&sort_by={{ current_sort_by }}&order={{ current_order }}&limit={{ current_limit }}" class="btn-secondary" style="padding: 4px 12px;">Next</a>
             {% else %}
                 <button class="btn-secondary" disabled style="padding: 4px 12px; border-color: var(--outline); color: var(--secondary);">Next</button>
             {% endif %}

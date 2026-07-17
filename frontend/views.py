@@ -66,8 +66,14 @@ class TaskListView(LoginRequiredMixin, ListView):
     template_name = "task_list.html"
     model = Task
     context_object_name = "tasks"
-    paginate_by = 10
     login_url = "login"
+
+    def get_paginate_by(self, queryset):
+        limit = self.request.GET.get('limit', '10')
+        try:
+            return int(limit)
+        except ValueError:
+            return 10
 
     def get_queryset(self):
         qs = Task.objects.filter(owner=self.request.user)
@@ -95,6 +101,7 @@ class TaskListView(LoginRequiredMixin, ListView):
         context['current_status'] = self.request.GET.get('status', '')
         context['current_sort_by'] = self.request.GET.get('sort_by', 'created_at')
         context['current_order'] = self.request.GET.get('order', 'desc')
+        context['current_limit'] = self.request.GET.get('limit', '10')
         return context
 
 class RegisterView(CreateView):
