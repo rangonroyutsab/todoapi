@@ -1,8 +1,21 @@
-# To-Do API
+# To-Do App & API
 
 ## Overview
-This project is a lightweight To-Do API built with Django REST Framework (DRF). It provides full CRUD operations for managing tasks, as well as JWT-based user authentication. The API is designed with strict validation rules, uniform JSON response formatting, and uses PostgreSQL as its database.
+This project is a full-stack To-Do application featuring a web frontend built with Django Templates and a RESTful API built with Django REST Framework (DRF). 
 
+The frontend provides a user-friendly web interface for managing tasks, while the backend API offers full CRUD operations, JWT-based user authentication, strict validation rules, and uniform JSON response formatting. The application uses PostgreSQL as its database.
+
+## Screenshots
+
+Here is a look at the web interface:
+
+| View / State | Description | Clickable Preview |
+|--------------|-------------|-------------------|
+| **1. Register** | User registration form to create a new account. | <a href="public/screenshots/register.png"><img src="public/screenshots/register.png" width="250" alt="Register Page"></a> |
+| **2. Login** | User login form to authenticate and obtain JWT token. | <a href="public/screenshots/login.png"><img src="public/screenshots/login.png" width="250" alt="Login Page"></a> |
+| **3. List Tasks** | Main dashboard view displaying all user tasks with status filtering. | <a href="public/screenshots/list_task.png"><img src="public/screenshots/list_task.png" width="250" alt="Tasks List Page"></a> |
+| **4. Create Task** | View/form where users can create a new task. | <a href="public/screenshots/create_task.png"><img src="public/screenshots/create_task.png" width="250" alt="Create Task Page"></a> |
+| **5. Edit Task** | View to edit/update an existing task's title, description, and status. | <a href="public/screenshots/edit_task.png"><img src="public/screenshots/edit_task.png" width="250" alt="Edit Task Page"></a> |
 
 
 ## Setup Instructions
